@@ -1,33 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace QuanLySinhVien_3105_2014468.classes
 {
-    public class QuanLySinhVien : QuanLy<SinhVien>
+    public class QuanLy<T>
     {
         #region properties
+        protected List<T> ds;
         #endregion
 
         #region constructors
+        public QuanLy()
+        {
+            ds = new List<T>();
+        }
         #endregion
 
         #region methods
-        public List<SinhVien> timSVTheoHoTen(string hoTen)
+        public void clear()
         {
-            return ds.FindAll(sv => {
-                return sv.hoTen.ToLower().Contains(hoTen.ToLower());
-            });
+            ds.Clear();
         }
 
-        public SinhVien timSVTheoID(int id)
+        public void them(T item)
         {
-            return ds.Find(sv => sv.id == id);
+            ds.Add(item);
+        }
+
+        public List<T> layDS()
+        {
+            return ds;
         }
         #endregion
+
     }
 }

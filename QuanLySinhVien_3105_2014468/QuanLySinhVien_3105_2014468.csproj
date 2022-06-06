@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="classes\Lop.cs" />
+    <Compile Include="classes\QuanLy.cs" />
     <Compile Include="classes\QuanLyLop.cs" />
     <Compile Include="classes\QuanLySinhVien.cs" />
     <Compile Include="classes\SinhVien.cs" />

@@ -35,7 +35,7 @@ namespace QuanLySinhVien_3105_2014468
             // lấy danh sách lớp
             layDSLop();
             // hiển thị danh sách sinh viên trên ListView
-            hienThiDSSinhVien(qlSV.layDSSinhVien());
+            hienThiDSSinhVien(qlSV.layDS());
         }
         #endregion
 
@@ -48,7 +48,9 @@ namespace QuanLySinhVien_3105_2014468
 
         private void connectDB()
         {
-            connectionStrings = ConfigurationManager.ConnectionStrings["QLSinhVien"].ConnectionString;
+            //connectionStrings = ConfigurationManager.ConnectionStrings["QLSinhVien"].ConnectionString;
+            connectionStrings = @"server=DESKTOP-UT3VJ3N\SQLEXPRESS; database=QlSinhVien; integrated security=true;";
+
             conn = new SqlConnection(connectionStrings);
             cmd = conn.CreateCommand();
 
@@ -75,17 +77,19 @@ namespace QuanLySinhVien_3105_2014468
             execCommand(() =>
             {
                 string tblName = "SinhVien";
-                cmd.CommandText = $"SELECT * FROM {tblName}";
+                // cmd.CommandText = $"SELECT * FROM {tblName}";
+                cmd.CommandText = "SELECT * FROM " + tblName;
                 SqlDataReader records = cmd.ExecuteReader();
                 while (records.Read())
                 {
+                    // đọc từng dòng và lưu trữ thông tin sinh viên
                     SinhVien sv = new SinhVien()
                     {
-                        id = (int)records["ID"],
+                        id = (int)records["ID"], // int.Parse()
                         hoTen = records["HoTen"].ToString(),
                         maLop = (int)records["MaLop"]
                     };
-                    qlSV.themSV(sv);
+                    qlSV.them(sv);
                 }
             });
         }
@@ -117,14 +121,14 @@ namespace QuanLySinhVien_3105_2014468
             }
             else
             {
-                hienThiDSSinhVien(qlSV.layDSSinhVien());
+                hienThiDSSinhVien(qlSV.layDS());
             }
         }
 
         private string layTenLopSV(int maLop)
         {
-            Lop found = qlLop.timLopTheoMaLop(maLop);
-            if (found != null)
+            Lop found = qlLop.timLopTheoID(maLop);
+            if (found != null) // nếu tìm thấy lớp có mã lớp cần tìm
             {
                 return found.tenLop;
             }
@@ -147,12 +151,12 @@ namespace QuanLySinhVien_3105_2014468
                         id = (int)records["ID"],
                         tenLop = records["TenLop"].ToString(),
                     };
-                    qlLop.themLop(l);
+                    qlLop.them(l);
                 }
             });
 
             // hiển thị danh sách lớp ra ComboBox
-            cbLop.DataSource = qlLop.layDSLop();
+            cbLop.DataSource = qlLop.layDS();
             cbLop.ValueMember = "ID";
             cbLop.DisplayMember = "TenLop";
         }
@@ -175,7 +179,7 @@ namespace QuanLySinhVien_3105_2014468
                     MessageBox.Show("Thêm sinh viên thành công!");
                     resetMacDinh();
                     // sau khi thêm thì tải lại danh sách sinh viên
-                    hienThiDSSinhVien(qlSV.layDSSinhVien());
+                    hienThiDSSinhVien(qlSV.layDS());
                 }
                 else
                 {
@@ -204,7 +208,7 @@ namespace QuanLySinhVien_3105_2014468
                     MessageBox.Show("Sửa thông tin sinh viên thành công!");
                     resetMacDinh();
                     // sau khi thêm thì tải lại danh sách sinh viên
-                    hienThiDSSinhVien(qlSV.layDSSinhVien());
+                    hienThiDSSinhVien(qlSV.layDS());
                 }
                 else
                 {
@@ -237,7 +241,7 @@ namespace QuanLySinhVien_3105_2014468
 
         private void btnTaiLai_Click(object sender, EventArgs e)
         {
-            hienThiDSSinhVien(qlSV.layDSSinhVien());
+            hienThiDSSinhVien(qlSV.layDS());
         }
 
         private void btnMacDinh_Click(object sender, EventArgs e)
@@ -255,14 +259,21 @@ namespace QuanLySinhVien_3105_2014468
         private void btnLuu_Click(object sender, EventArgs e)
         {
             string mssv = txtMSSV.Text;
-            if (string.IsNullOrEmpty(mssv))
+            if (!string.IsNullOrEmpty(txtHoTen.Text) && !string.IsNullOrWhiteSpace(txtHoTen.Text))
             {
-                themSV();
+                if (string.IsNullOrEmpty(mssv))
+                {
+                    themSV();
+                }
+                else
+                {
+                    int id = int.Parse(mssv);
+                    suaSV(id);
+                }
             }
             else
             {
-                int id = int.Parse(mssv);
-                suaSV(id);
+                MessageBox.Show("Chưa nhập tên!");
             }
         }
 
